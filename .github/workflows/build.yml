@@ -1,0 +1,29 @@
+name: build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+          
+      - name: build
+        run: |
+          go build -race -trimpath -ldflags "-w -s" -o ./release/frpc.exe ./cmd/frpc
+          go build -race -trimpath -ldflags "-w -s" -o ./release/frps.exe ./cmd/frps
+
+      - name: Update artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: frp
+          path: ./release
